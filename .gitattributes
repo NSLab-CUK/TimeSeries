@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.sh text eol=lf
+# Keep archived parser and recorded metadata bytes stable for SHA-256 checks.
+src/audit_raw.py -text whitespace=cr-at-eol
+metadata/** -text whitespace=cr-at-eol
+configs/** -text whitespace=cr-at-eol
+archive/** -text whitespace=cr-at-eol

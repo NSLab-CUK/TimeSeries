@@ -1,0 +1,5 @@
+numpy==2.2.6
+pandas==2.2.2
+openpyxl==3.1.5
+matplotlib==3.9.0
+# Install torch==2.5.1 from the CUDA 12.4 index separately; see README.

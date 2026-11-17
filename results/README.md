@@ -1,0 +1,1 @@
+Generated outputs go here and are excluded from Git. Training jobs contain `data_contract/`, `smoke/`, `full/`, `workers/` and console logs. Use a new job name after changing source or experiment settings.

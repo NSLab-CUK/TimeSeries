@@ -1,0 +1,75 @@
+{
+  "pipeline": "NEW_STRICT_FORECASTING_A; not_historical_reproduction",
+  "features": [
+    "FNC-1",
+    "FNC-2",
+    "FNC-3",
+    "TI-2",
+    "TI-3",
+    "TI-4",
+    "TI-5",
+    "PI-2",
+    "PI-3",
+    "PI-4",
+    "PI-5",
+    "CO",
+    "CO2",
+    "CH4",
+    "H2"
+  ],
+  "targets": [
+    "CO",
+    "CO2",
+    "CH4",
+    "H2"
+  ],
+  "window": 30,
+  "lead_seconds": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "process_and_gas_latest_time": "target_timestamp - h seconds",
+  "history_rows": "[target_row-h-window+1, target_row-h] inclusive",
+  "target_gas_exposure": false,
+  "target_time_process_exposure": false,
+  "intermediate_future_gas_exposure": false,
+  "mask": "none; no future rows are inserted",
+  "availability_assumption": "logged sensor/gas values acquired no later than origin; analyzer latency still requires laboratory confirmation",
+  "flow_channels": "excluded_in_new_pipeline; uncertain physical definitions and missing-channel assumptions avoided",
+  "record_rules": "exclude_filename_pyrolysis; absolute_clock_required; finite selected features; split at any non-1s step; retain negatives/spikes",
+  "scaler_fit_roles": [
+    "train"
+  ],
+  "scaler_fit_observation_rows": 32234,
+  "scaler_fit_file_ids": [
+    "20210504_mask pellet air gasificaion",
+    "20210510_Mask pellet steam gasification",
+    "20210517_MASK pellet CO2 가스화",
+    "20210520_mask pellet_steam 가스화",
+    "20210609_mask pellet air 가스화_2차",
+    "20210621_MASK PELLET_CO2가스화_NON AC",
+    "20210730_mask pellet_air",
+    "20220105_mask_O2_steam_ gasification",
+    "220718_mask o2steam gasification_with ac",
+    "221028_mask o2steam gasification_with ac"
+  ],
+  "split_sha256": "5fa44d8dbb8076e7dfa86a542bb716b165e0744eff2289dae37d882f302b4161",
+  "scaler_sha256": "0cd5aa325fe78e3ab6580bcccad21ca7b0a20b3172d62a73104e139887e10985",
+  "target_index_sha256": "8761cecb51fdadb89af5dfcda0fc22f93f32494c60f1105e4573963e85777378",
+  "raw_parser_sha256": "54963226227c7181d0e2b122387cfdaaa10b87a4cbc131e4268beea99346ec8d",
+  "hyperparameters": "predeclared single layer, hidden64, Adam lr0.001 weight_decay0.0001, L1 standardized target, batch64, max200, patience20",
+  "tuning": "none; validation-only checkpoint selection; never select using test",
+  "test_scope": "two historically inspected records held out from NEW fitting/tuning; not new physical or prospectively blind experiments",
+  "counts_by_role": {
+    "test": 2,
+    "train": 10,
+    "validation": 4
+  },
+  "common_targets_by_role": {
+    "test": 7266,
+    "train": 31670,
+    "validation": 11622
+  }
+}
