@@ -1,100 +1,114 @@
-# TimeSeries: gas-composition forecasting
+# Time-Series Soft Sensing of Syngas Evolution during Fluidized-Bed Gasification of Waste Masks
 
-RNN, LSTM and GRU forecasting of CO, CO2, CH4 and H2 from gasification measurements. This repository organizes the **NEW strict forecasting protocol** used for the revised experiments. It does not reproduce the historical June 2025 training run.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&amp;logoColor=white&amp;style=flat-square" alt="Python 3.11" />
+  <img src="https://img.shields.io/badge/PyTorch-2.5.1-EE4C2C?logo=pytorch&amp;logoColor=white&amp;style=flat-square" alt="PyTorch 2.5.1" />
+  <img src="https://img.shields.io/badge/CUDA-12.4-76B900?logo=nvidia&amp;logoColor=white&amp;style=flat-square" alt="CUDA 12.4" />
+</p>
 
-## Repository layout
+**TimeSeries** is a PyTorch implementation of RNN, LSTM, and GRU models for forecasting syngas composition from measured gasification time series. The implementation is maintained by the [Network Science Lab at The Catholic University of Korea](https://nslab-cuk.github.io/).
 
-```text
-.
-├── reproduce.py             # Inspect, prepare, checkpoint inference, evaluation and plots
-├── src/
-│   ├── pipeline.py          # Dataset, fixed model definitions, fitting and cache checks
-│   └── audit_raw.py         # Original raw parser, preserved byte for byte
-├── scripts/                 # Training launchers and Linux CUDA environment setup
-├── configs/                 # Recorded protocol and 120 model configurations
-├── metadata/                # Record identities, splits, hashes and provenance
-├── requirements/            # Training and optional archived-analysis dependencies
-├── requirements.txt         # Data preparation, evaluation and plotting dependencies
-├── data/raw/                # Local measurements; excluded from Git
-├── results/                 # Local generated outputs; excluded from Git
-├── permissioned_artifacts/  # Separately supplied checkpoints/caches; excluded from Git
-├── archive/                 # Original paper-analysis source and release documentation
-└── docs/                    # Data placement, reproduction and reorganization notes
+## 1. Overview
+
+Syngas composition changes as fuel feed, reactor conditions, and gas-phase reactions evolve during fluidized-bed gasification. This study uses reactor measurements from waste-mask gasification under air, CO₂, O₂/steam, and steam conditions to evaluate short-horizon predictions of **CO, CO₂, CH₄, and H₂**.
+
+The forecast starts at time *t* using 30 consecutive one-second observations through *t*. Each observation contains 11 logged reactor-sensor channels and four gas concentration measurements. A single recurrent layer encodes the sequence, and a linear head maps its final hidden state to the four gas concentrations at *t* + *h*. A separate model is fitted for each lead time *h* ∈ {1, 3, 5, 10} s.
+
+```mermaid
+flowchart LR
+    A["30 observations through t<br/>11 sensor channels + 4 gas histories"] --> B["Recurrent layer<br/>RNN, LSTM, or GRU"]
+    B --> C["Final hidden state<br/>Linear output head"]
+    C --> D["CO, CO₂, CH₄, H₂ at t + h<br/>h = 1, 3, 5, or 10 s"]
 ```
 
-`configs/protocol.json` and `configs/model_configs.csv` describe the recorded experiment. The current implementation uses fixed settings in `src/pipeline.py`; these files are reference metadata, not runtime configuration switches.
+The paper's revised evaluation holds out two entire experimental records and compares the models with persistence, which carries the last available gas measurement forward. The relative performance varies by gas and lead time. Real-time use depends on whether the recorded gas measurements are available at the forecast origin.
 
-## Installation
+## 2. Reproducibility
 
-Use Python 3.11. The recorded training stack was Python 3.11.18, PyTorch 2.5.1+cu124, NumPy 2.2.6 and pandas 2.2.2 on four RTX A5000 GPUs; see `metadata/environment_training.json` for the archived record.
+### Datasets
+
+The protocol uses a fixed **10 training / 4 validation / 2 test** split by experimental record. Timestamp gaps or nonfinite selected measurements break the input sequences. Standardization uses training observations only. Every model and lead is evaluated at the same eligible test timestamps.
+
+Preparing or replaying the experiment requires authorized access to the raw measurements or a completed job, respectively. For preparation, place all 17 gasification candidates under `data/raw/` using the relative paths from the [data manifest](metadata/data_manifest.csv). One candidate lacks an absolute clock and is excluded during preparation. See the [data placement guide](docs/DATA.md) for the directory structure and file checks.
+
+### Requirements and environment setup
+
+The recorded training environment used Python 3.11.18, PyTorch 2.5.1 with CUDA 12.4, and four NVIDIA RTX A5000 GPUs. The [environment record](metadata/environment_training.json) gives the complete per-worker details.
 
 ```bash
-python -m venv .venv
+gh repo clone NSLab-CUK/TimeSeries
+cd TimeSeries
+
+python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu124
-python reproduce.py inspect
 ```
 
-On Windows, activate with `.venv\Scripts\Activate.ps1`. The Linux GPU setup helper below manages its own `.venvs/` environment instead. `inspect` lists missing records without fitting or requiring CUDA. Measurements, fitted weights, observation caches and manuscript documents are not included.
+For preprocessing and checkpoint inference on CPU, install PyTorch with the CPU wheel index. The Linux GPU launcher below has its own CUDA environment setup.
 
-## Data and preparation
+```bash
+python -m pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+```
 
-Place the unchanged source files under `data/raw/`, preserving each relative `source_file` path in `metadata/data_manifest.csv`. See [data placement](docs/DATA.md). The parser excludes pyrolysis records and the clockless spreadsheet from fitting according to the fixed protocol.
+### Quick checks and data preparation
+
+The first two commands work from a fresh clone without experimental records or GPUs. `inspect` lists the expected files. `--plan-only` shows the four-worker assignment without starting training.
+
+```bash
+python reproduce.py inspect
+python scripts/run_4gpu.py --gpus 0,1,2,3 --plan-only --job syngas_forecasting
+```
+
+With authorized records in place, verify the raw file hashes, split, target timestamps, and training-only scaler. Use an empty output directory.
 
 ```bash
 python reproduce.py prepare --output results/prepared
 ```
 
-Preparation verifies the recorded split, target timestamps and scaler digests. Output directories must be empty. Different source bytes, file roles or normalization constitute a different experiment.
+### Train on four GPUs
 
-## Training on four GPUs
-
-Preview assignments without reading data or starting training:
-
-```bash
-python scripts/run_4gpu.py --gpus 0,1,2,3 --plan-only --job reproduced_forecasting
-```
-
-Set up the Linux environment, then explicitly start the training job:
+Run these commands from the repository root on Linux with the raw records in place. GPUs 0–3 handle leads 1, 3, 5, and 10 s, respectively. The launcher checks devices and runs short trial fits before the full experiment. Progress appears in the terminal and worker logs under `results/syngas_forecasting/`.
 
 ```bash
 GPU_IDS=0,1,2,3 bash scripts/setup_env.sh
-GPU_IDS=0,1,2,3 bash scripts/run_4gpu.sh --resume --job reproduced_forecasting
+GPU_IDS=0,1,2,3 bash scripts/run_4gpu.sh --job syngas_forecasting
 ```
 
-The launcher runs device checks and small smoke fits before full fitting. GPU 0/1/2/3 receives leads 1/3/5/10 seconds. Outputs go to `results/reproduced_forecasting/`; terminal and worker logs show progress. Use the same job and `--resume` only for matching provenance. This directory reorganization did not start a training run.
+To continue an interrupted run of this checkout, repeat the launch command with `--resume` and the same job name. Use a new job name when source files or settings change.
 
-## Checkpoint inference and evaluation
+### Replay checkpoints, evaluate, and plot
 
-With a separately supplied completed job (containing `data_contract/` and `full/`):
+Place the authorized completed job under `permissioned_artifacts/training/`, with its `data_contract/` cache and `full/` training outputs intact. For a job trained using the commands above, use `--job-dir results/syngas_forecasting` instead.
 
 ```bash
-python reproduce.py infer --job-dir permissioned_artifacts/training --model gru --lead 10 --seed 20261113 --device cpu --output results/gru10_replay
-python reproduce.py evaluate --job-dir permissioned_artifacts/training --output results/evaluation
+python reproduce.py infer --job-dir permissioned_artifacts/training \
+  --model gru --lead 10 --seed 20261113 --device cpu --output results/gru10_replay
+python reproduce.py evaluate --job-dir permissioned_artifacts/training \
+  --output results/evaluation
 python reproduce.py plot --evaluation-dir results/evaluation --output results/plots
 ```
 
-For a newly completed job, use `--job-dir results/reproduced_forecasting`. Inference verifies the saved checkpoint/scaler and compares predictions with the stored arrays (default tolerance `1e-5`). Evaluation checks all 120 completed fits. See [reproduction details](docs/REPRODUCIBILITY.md) and [validation boundaries](docs/VALIDATION.md).
+`infer` compares the selected checkpoint's predictions with saved predictions. `evaluate` recomputes MAE, MSE, RMSE, and R² for all 120 fits and scores persistence on the same targets. `plot` generates the standard comparison plots from the resulting tables. See [reproduction details](docs/REPRODUCIBILITY.md) and the [recorded checks](docs/VALIDATION.md).
 
-## Experiment scope
+### Training settings and aggregation
 
-- Inputs: 11 process channels and four gas histories; 30 consecutive rows ending at prediction origin.
-- Targets: four gases at actual leads of 1, 3, 5 and 10 seconds; identical common target rows across models and leads.
-- Fixed file split: 10 train / 4 validation / 2 test. Scaling uses only unique finite, clocked training observations.
-- One recurrent layer, hidden size 64, linear four-output head; batch 64; Adam `lr=0.001`, `weight_decay=0.0001`; standardized L1 loss; at most 200 epochs; validation patience 20.
-- Three models × four leads × ten optimization seeds (`20261113`–`20261122`) = 120 fits.
-- Reported equal-record summaries average two record-specific scores within each seed, then summarize ten seeds with sample SD. Seeds do not represent independent physical experiments.
+| Setting | Value |
+| --- | --- |
+| Architecture | One recurrent layer, 64 hidden units, four-output linear head |
+| Input length | 30 consecutive observations |
+| Leads | 1, 3, 5, and 10 seconds |
+| Optimization | Adam with learning rate 0.001 and weight decay 0.0001, batch size 64 |
+| Loss and stopping | L1 on standardized outputs, at most 200 epochs, validation patience 20 |
+| Runs | 3 architectures × 4 leads × 10 seeds = 120 fits |
 
-The two test records were historically inspected and held out from NEW fitting/tuning. Analyzer latency, physical concentration basis and some laboratory metadata still require laboratory confirmation. Negative observations/spikes and unconstrained predictions are retained.
+For each seed, the two test records receive equal weight when averaging the record-level scores. The paper reports the mean and sample standard deviation across the ten seeds. The seed repeats measure training variability within the fixed split.
 
-## Development
+The implementation for the revised experiment is in [`src/pipeline.py`](src/pipeline.py). [`configs/protocol.json`](configs/protocol.json) and [`configs/model_configs.csv`](configs/model_configs.csv) record the settings and fit assignments. The older analysis scripts are documented in [`archive/`](archive/README.md).
 
-```bash
-gh repo clone NSLab-CUK/TimeSeries
-cd TimeSeries
-```
+## 3. Reference and citation
 
-This directory is the repository root. `.gitignore` excludes raw data, generated outputs, checkpoints, local environments and credentials. Before committing changes, inspect `git status --short` and `git diff --cached --stat` to review the upload set.
+Chae Eun Hyun, Ji Young Nam, Seo Yeon Ahn, Junhee Cho, Myung Won Seo, Dong Hyun Lee, O-Joun Lee, and Jun Young Kim. *Time series Soft Sensing of Syngas Evolution during Fluidized bed Gasification of Waste Masks Using Recurrent Neural Networks*. Manuscript.
 
-The code is provided without raw measurements or fitted artifacts. See [LICENSE_PENDING.md](LICENSE_PENDING.md) for the recorded license status; an open-source license has not been assigned.
+For work using this implementation, cite the manuscript and include the [TimeSeries repository](https://github.com/NSLab-CUK/TimeSeries) and the commit used.
+
+See the [license status](LICENSE_PENDING.md) for code reuse.
