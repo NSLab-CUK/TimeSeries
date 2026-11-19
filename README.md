@@ -14,12 +14,9 @@ Syngas composition changes as fuel feed, reactor conditions, and gas-phase react
 
 The forecast starts at time *t* using 30 consecutive one-second observations through *t*. Each observation contains 11 logged reactor-sensor channels and four gas concentration measurements. A single recurrent layer encodes the sequence, and a linear head maps its final hidden state to the four gas concentrations at *t* + *h*. A separate model is fitted for each lead time *h* ∈ {1, 3, 5, 10} s.
 
-```mermaid
-flowchart LR
-    A["30 observations through t<br/>11 sensor channels + 4 gas histories"] --> B["Recurrent layer<br/>RNN, LSTM, or GRU"]
-    B --> C["Final hidden state<br/>Linear output head"]
-    C --> D["CO, CO₂, CH₄, H₂ at t + h<br/>h = 1, 3, 5, or 10 s"]
-```
+<p align="center">
+  <img src="docs/architecture.svg" width="100%" alt="Thirty one-second observations with 15 features feed a 64-unit RNN, LSTM, or GRU. A linear head predicts CO, CO2, CH4, and H2 at the selected lead time." />
+</p>
 
 The paper's revised evaluation holds out two entire experimental records and compares the models with persistence, which carries the last available gas measurement forward. The relative performance varies by gas and lead time. Real-time use depends on whether the recorded gas measurements are available at the forecast origin.
 

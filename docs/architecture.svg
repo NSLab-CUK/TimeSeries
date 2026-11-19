@@ -1,0 +1,560 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="576" viewBox="0 0 1280 576" role="img" aria-labelledby="title description">
+  <title id="title">Recurrent syngas forecasting architecture</title>
+  <desc id="description">A window of 30 one-second observations ends at forecast origin t. Each row in time contains 11 reactor signals and four measured gas concentrations. A single RNN, LSTM, or GRU layer with 64 hidden units encodes the window. The final state enters a linear head with four outputs for CO, CO2, CH4, and H2. A separate model is trained for each lead time of 1, 3, 5, or 10 seconds.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#f5fafb"/><stop offset="1" stop-color="#f5f6fd"/>
+    </linearGradient>
+    <linearGradient id="head" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#334997"/><stop offset="1" stop-color="#45417d"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1l7 4-7 4z" fill="#52659a"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #1a2742; }
+      .title { font-size: 40px; font-weight: 700; letter-spacing: -.9px; }
+      .heading { font-size: 23px; font-weight: 700; }
+      .sub { font-size: 18px; fill: #42536d; }
+      .label { font-size: 17px; font-weight: 700; }
+      .small { font-size: 16px; fill: #44546e; }
+      .center { text-anchor: middle; }
+      .white { fill: #fff; }
+      .frame { fill: #fff; stroke: #d6e0ea; stroke-width: 1.5; }
+      .wire { fill: none; stroke: #52659a; stroke-width: 2; marker-end: url(#arrow); }
+      .sensor { fill: #b3dedb; }
+      .gas { fill: #a7b7ea; }
+    </style>
+  </defs>
+  <rect x="1" y="1" width="1278" height="574" rx="23" fill="url(#background)" stroke="#d9e2eb" stroke-width="2"/>
+  <text class="title" x="48" y="70">Recurrent syngas forecasting</text>
+  <text class="sub" x="49" y="105">Waste-mask gasification in a fluidized bed</text>
+
+  <rect class="frame" x="47" y="139" width="322" height="307" rx="17"/>
+  <rect class="frame" x="410" y="139" width="444" height="307" rx="17"/>
+  <rect class="frame" x="897" y="139" width="335" height="307" rx="17"/>
+
+  <text class="heading" x="69" y="177">Observation window</text>
+  <text class="sub" x="69" y="202">30 consecutive samples at 1 Hz</text>
+  <rect x="65" y="212" width="286" height="133" rx="8" fill="#f6fafc" stroke="#e1eaf1"/>
+      <rect class="sensor" x="73" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="219" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="226.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="234" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="241.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="249" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="256.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="264" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="271.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="279" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="286.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="73" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="82" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="91" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="100" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="109" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="118" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="127" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="136" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="145" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="154" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="163" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="172" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="181" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="190" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="199" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="208" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="217" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="226" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="235" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="244" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="253" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="262" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="271" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="280" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="289" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="298" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="307" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="316" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="325" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="sensor" x="334" y="294" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="73" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="82" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="91" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="100" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="109" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="118" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="127" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="136" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="145" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="154" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="163" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="172" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="181" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="190" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="199" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="208" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="217" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="226" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="235" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="244" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="253" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="262" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="271" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="280" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="289" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="298" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="307" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="316" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="325" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="334" y="307" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="73" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="82" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="91" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="100" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="109" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="118" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="127" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="136" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="145" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="154" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="163" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="172" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="181" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="190" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="199" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="208" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="217" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="226" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="235" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="244" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="253" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="262" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="271" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="280" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="289" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="298" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="307" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="316" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="325" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="334" y="314.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="73" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="82" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="91" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="100" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="109" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="118" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="127" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="136" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="145" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="154" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="163" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="172" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="181" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="190" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="199" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="208" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="217" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="226" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="235" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="244" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="253" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="262" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="271" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="280" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="289" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="298" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="307" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="316" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="325" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="334" y="322" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="73" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="82" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="91" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="100" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="109" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="118" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="127" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="136" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="145" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="154" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="163" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="172" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="181" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="190" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="199" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="208" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="217" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="226" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="235" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="244" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="253" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="262" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="271" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="280" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="289" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="298" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="307" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="316" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="325" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+    <rect class="gas" x="334" y="329.5" width="6.5" height="5.5" rx="1.3"/>
+  <path d="M72 351v6h271v-6" fill="none" stroke="#8595ae" stroke-width="1.5"/>
+  <text class="small center" x="207" y="377">Time</text>
+  <rect x="71" y="394" width="13" height="13" rx="2.5" fill="#64b5b1"/>
+  <text class="small" x="94" y="405">11 reactor sensor signals</text>
+  <rect x="71" y="417" width="13" height="13" rx="2.5" fill="#8a9cdb"/>
+  <text class="small" x="94" y="428">4 gas concentration histories</text>
+
+  <path class="wire" d="M375 299h28"/>
+  <text class="heading" x="433" y="177">Recurrent encoder</text>
+  <text class="sub" x="433" y="202">One cell type per run</text>
+  <g class="center label">
+    <rect x="433" y="220" width="116" height="36" rx="7" fill="#e9edf9"/>
+    <text x="491" y="244">RNN</text>
+    <rect x="574" y="220" width="116" height="36" rx="7" fill="#e9edf9"/>
+    <text x="632" y="244">LSTM</text>
+    <rect x="715" y="220" width="116" height="36" rx="7" fill="#e9edf9"/>
+    <text x="773" y="244">GRU</text>
+  </g>
+
+  <rect x="433" y="279" width="72" height="46" rx="8" fill="#ecf0fb" stroke="#becbec"/>
+  <rect x="547" y="279" width="72" height="46" rx="8" fill="#ecf0fb" stroke="#becbec"/>
+  <rect x="736" y="279" width="95" height="46" rx="8" fill="#344889"/>
+  <path class="wire" d="M505 302h36"/>
+  <path d="M619 302h29" fill="none" stroke="#52659a" stroke-width="2"/>
+  <text class="label center" x="675" y="306">···</text>
+  <path class="wire" d="M702 302h29"/>
+  <g class="center label">
+    <text x="469" y="308">Cell</text>
+    <text x="583" y="308">Cell</text>
+    <text class="white" x="783.5" y="308">Cell</text>
+  </g>
+  <g class="center small">
+    <text x="469" y="351">t − 29</text>
+    <text x="583" y="351">t − 28</text>
+    <text x="783.5" y="351">t</text>
+  </g>
+  <rect x="433" y="384" width="398" height="41" rx="8" fill="#f3f5fa"/>
+  <text class="small" x="449" y="410">Single layer</text>
+  <path d="M551 395v19" stroke="#cad3e3"/>
+  <text class="small" x="567" y="410">64 hidden units</text>
+  <path d="M698 395v19" stroke="#cad3e3"/>
+  <text class="small" x="714" y="410">Final state hₜ</text>
+
+  <path class="wire" d="M831 302h93"/>
+  <text class="heading" x="920" y="177">Gas forecast at t + h</text>
+  <text class="sub" x="920" y="202">Four concentration outputs</text>
+  <rect x="925" y="279" width="279" height="46" rx="8" fill="url(#head)"/>
+  <text class="center label white" x="1064.5" y="308">Linear head · 64 → 4</text>
+  <path d="M1065 325v15" fill="none" stroke="#52659a" stroke-width="2" marker-end="url(#arrow)"/>
+  <g fill="#f1f4fb" stroke="#dee5f5">
+    <rect x="925" y="348" width="62" height="40" rx="7"/>
+    <rect x="997" y="348" width="62" height="40" rx="7"/>
+    <rect x="1069" y="348" width="62" height="40" rx="7"/>
+    <rect x="1141" y="348" width="63" height="40" rx="7"/>
+  </g>
+  <g class="center label">
+    <text x="956" y="374">CO</text>
+    <text x="1028" y="374">CO₂</text>
+    <text x="1100" y="374">CH₄</text>
+    <text x="1172" y="374">H₂</text>
+  </g>
+  <text class="small center" x="1064.5" y="421">Restore the concentration scale</text>
+
+  <path d="M81 494h701" stroke="#237c7a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M783 494h400" stroke="#52659a" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+  <circle cx="81" cy="494" r="5" fill="#237c7a"/>
+  <circle cx="783" cy="494" r="7" fill="#344889" stroke="white" stroke-width="2"/>
+  <text class="small" x="80" y="527">Window begins at t − 29</text>
+  <text class="label center" x="783" y="527">Forecast origin t</text>
+  <text class="small" x="1177" y="527" text-anchor="end">Lead h = 1, 3, 5, or 10 s</text>
+</svg>
