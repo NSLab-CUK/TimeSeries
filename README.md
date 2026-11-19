@@ -10,15 +10,33 @@
 
 ## 1. Overview
 
-Syngas composition changes as fuel feed, reactor conditions, and gas-phase reactions evolve during fluidized-bed gasification. This study uses reactor measurements from waste-mask gasification under air, CO₂, O₂/steam, and steam conditions to evaluate short-horizon predictions of **CO, CO₂, CH₄, and H₂**.
+Gas composition changes as waste-mask pellets enter the fluidized bed and react under different gasifying atmospheres. The study uses recent reactor signals and gas measurements to forecast **CO, CO₂, CH₄, and H₂** in the resulting syngas. The experiments cover air, CO₂, O₂/steam, and steam gasification.
 
-The forecast starts at time *t* using 30 consecutive one-second observations through *t*. Each observation contains 11 logged reactor-sensor channels and four gas concentration measurements. A single recurrent layer encodes the sequence, and a linear head maps its final hidden state to the four gas concentrations at *t* + *h*. A separate model is fitted for each lead time *h* ∈ {1, 3, 5, 10} s.
+### Experimental apparatus
+
+<p align="center">
+  <img src="docs/gasification-apparatus.png" width="820" alt="Experimental setup showing the waste-mask pellet feeder, gas and steam supply, preheater, bubbling fluidized-bed reactor, cyclone, activated-carbon bed, condenser and chiller, NDIR gas analyzer, and gas scrubber." />
+</p>
+<p align="center"><em>Fig. 1. Schematic diagram of the experimental apparatus for waste-mask gasification.</em></p>
+
+A screw feeder delivers the pellets into a bubbling fluidized bed of silica sand. Mass-flow controllers regulate the gas supply. In steam-containing experiments, a peristaltic pump supplies water that is vaporized and preheated with nitrogen. Temperature and pressure are monitored at different reactor heights. The cyclone removes entrained solids. The downstream setup shown in Fig. 1 includes an activated-carbon reactor and a condenser–chiller. A nondispersive infrared (NDIR) analyzer measures the product-gas concentrations.
+
+### From reactor measurements to forecasts
+
+The model takes 30 consecutive one-second observations ending at the forecast origin *t*. Each observation contains 11 selected reactor signals and four measured gas concentrations. Windows stay within uninterrupted records, and the standardization parameters are fitted to the training records alone. The forecaster uses the information recorded through *t* to predict all four concentrations at *t + h*, where *h* is 1, 3, 5, or 10 seconds.
 
 <p align="center">
   <img src="docs/architecture.svg" width="100%" alt="Thirty one-second observations with 15 features feed a 64-unit RNN, LSTM, or GRU. A linear head predicts CO, CO2, CH4, and H2 at the selected lead time." />
 </p>
+<p align="center"><em>Recurrent forecasting architecture used in the repository.</em></p>
 
-The paper's revised evaluation holds out two entire experimental records and compares the models with persistence, which carries the last available gas measurement forward. The relative performance varies by gas and lead time. Real-time use depends on whether the recorded gas measurements are available at the forecast origin.
+RNN, LSTM, and GRU are fitted separately at each lead time. Each model uses one recurrent layer with 64 hidden units and a linear head that maps the final hidden state to four outputs. Predictions are converted back to the source concentration scale for evaluation. Real-time use depends on whether the analyzer readings are available by the forecast origin.
+
+### Evaluation and findings
+
+The revised experiment uses 10 training, 4 validation, and 2 test records. The two held-out records represent air and CO₂ gasification. The three architectures, four leads, and ten training seeds produce 120 fits on this fixed split. All models and the persistence baseline use the same test timestamps. Persistence carries forward the last gas values observed at *t*.
+
+On the two test records, RNN had the lowest mean H₂ RMSE among the neural models at 1 and 3 s, and GRU at 5 and 10 s. At 10 s, persistence gave a lower mean H₂ RMSE than all three neural models. It also gave a lower mean CO₂ RMSE at every lead. The comparison describes performance on these two records and depends on both the gas and the forecast horizon.
 
 ## 2. Reproducibility
 
@@ -33,8 +51,8 @@ Preparing or replaying the experiment requires authorized access to the raw meas
 The recorded training environment used Python 3.11.18, PyTorch 2.5.1 with CUDA 12.4, and four NVIDIA RTX A5000 GPUs. The [environment record](metadata/environment_training.json) gives the complete per-worker details.
 
 ```bash
-gh repo clone NSLab-CUK/TimeSeries
-cd TimeSeries
+gh repo clone NSLab-CUK/Timeseries-Soft-Sensing-of-Syngas-Evolution
+cd Timeseries-Soft-Sensing-of-Syngas-Evolution
 
 python3.11 -m venv .venv
 source .venv/bin/activate
@@ -106,6 +124,6 @@ The implementation for the revised experiment is in [`src/pipeline.py`](src/pipe
 
 Chae Eun Hyun, Ji Young Nam, Seo Yeon Ahn, Junhee Cho, Myung Won Seo, Dong Hyun Lee, O-Joun Lee, and Jun Young Kim. *Time series Soft Sensing of Syngas Evolution during Fluidized bed Gasification of Waste Masks Using Recurrent Neural Networks*. Manuscript.
 
-For work using this implementation, cite the manuscript and include the [TimeSeries repository](https://github.com/NSLab-CUK/TimeSeries) and the commit used.
+For work using this implementation, cite the manuscript and include the [TimeSeries repository](https://github.com/NSLab-CUK/Timeseries-Soft-Sensing-of-Syngas-Evolution) and the commit used.
 
 See the [license status](LICENSE_PENDING.md) for code reuse.
