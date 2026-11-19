@@ -17,12 +17,9 @@ dist/
 Thumbs.db
 
 # Local measurements and generated artifacts
-/data/raw/*
-!/data/raw/.gitkeep
-/results/*
-!/results/README.md
-/permissioned_artifacts/*
-!/permissioned_artifacts/README.md
+/data/raw/
+/results/
+/permissioned_artifacts/
 local_checks/
 **/server_runs/
 **/checkpoints/

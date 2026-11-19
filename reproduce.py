@@ -35,7 +35,7 @@ def inspect(args):
     print(json.dumps(dict(scope='NEW forecasting; not historical execution reproduction',
         file_roles=split.groupby('role').size().to_dict(),full_fits=120,
         raw_records_included=False,missing_permissioned_record_paths=missing,
-        checkpoint_files_included=False,repository_status='local GitHub layout; remote publication not inspected'),ensure_ascii=False,indent=2))
+        checkpoint_files_included=False,repository_status='code and experiment metadata'),ensure_ascii=False,indent=2))
 def prepare(args):
     import numpy as np
     import pandas as pd
@@ -146,7 +146,7 @@ def plot(args):
     fig.suptitle('Fixed 2-record test; mean and sample SD over 10 optimization seeds; not confidence intervals')
     fig.tight_layout()
     for ext in ['png','pdf','svg']: fig.savefig(out/f'all_gas_persistence.{ext}',dpi=180)
-    print('Saved data-driven comparison plots. Exact paper source: archive/paper_analysis/analyze_and_plot.py')
+    print('Saved the four-gas RMSE comparison plots.')
 def main():
     p=argparse.ArgumentParser(description=__doc__); sub=p.add_subparsers(dest='command',required=True)
     s=sub.add_parser('inspect'); s.set_defaults(func=inspect)
